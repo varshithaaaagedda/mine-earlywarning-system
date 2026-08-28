@@ -19,15 +19,17 @@ app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Ensure database schema initialization runs safely on cold starts
-app.use(async (req, res, next) => {
-  try {
-    await initializeDatabase();
-    next();
-  } catch (err) {
-    console.error('❌ Database Initialization Error:', err.message);
-    next();
+// Cold-start database schema initialization
+initializeDatabase().catch(err => {
+  console.error('❌ Cold-start Database Initialization Error:', err.message);
+});
+
+// URL path normalization for Vercel serverless function rewrites
+app.use((req, res, next) => {
+  if (req.url.startsWith('/api/index.js')) {
+    req.url = req.url.replace('/api/index.js', '') || '/';
   }
+  next();
 });
 
 // Mount REST API Routes (supports both /api prefix and root subpaths for Vercel serverless compatibility)
