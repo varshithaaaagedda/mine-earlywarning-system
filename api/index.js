@@ -62,6 +62,8 @@ app.get(['/api', '/api/'], (req, res) => {
 });
 
 // Serve static frontend assets for root or non-API requests
+app.use('/css', express.static(path.join(__dirname, '..', 'css')));
+app.use('/js', express.static(path.join(__dirname, '..', 'js')));
 app.use(express.static(path.join(__dirname, '..')));
 
 // Serve index.html for root page requests
