@@ -355,5 +355,58 @@ window.MineData = {
     }
 
     return sensors;
+  },
+
+  // Asynchronously Sync Data from REST API Backend
+  async loadFromBackend(siteId = "singareni-s4") {
+    const API_BASE = '/api';
+    try {
+      // 1. Fetch KPI Metrics
+      const kpiRes = await fetch(`${API_BASE}/sites/${siteId}/kpis`).then(r => r.json());
+      if (kpiRes.success && kpiRes.kpis) {
+        this.kpis = kpiRes.kpis;
+      }
+
+      // 2. Fetch Latest Telemetry
+      const telRes = await fetch(`${API_BASE}/sites/${siteId}/telemetry/latest`).then(r => r.json());
+      if (telRes.success && telRes.telemetry) {
+        this.telemetry = telRes.telemetry;
+      }
+
+      // 3. Fetch Risk Zones
+      const zonesRes = await fetch(`${API_BASE}/sites/${siteId}/zones`).then(r => r.json());
+      if (zonesRes.success && zonesRes.zones) {
+        this.zones = zonesRes.zones;
+      }
+
+      // 4. Fetch Tunnels
+      const tunRes = await fetch(`${API_BASE}/sites/${siteId}/tunnels`).then(r => r.json());
+      if (tunRes.success && tunRes.tunnels) {
+        this.tunnels = tunRes.tunnels;
+      }
+
+      // 5. Fetch Surface Infrastructure
+      const infraRes = await fetch(`${API_BASE}/sites/${siteId}/infrastructure`).then(r => r.json());
+      if (infraRes.success && infraRes.surfaceInfrastructure) {
+        this.surfaceInfrastructure = infraRes.surfaceInfrastructure;
+      }
+
+      // 6. Fetch Displacement History
+      const histRes = await fetch(`${API_BASE}/sites/${siteId}/history`).then(r => r.json());
+      if (histRes.success && histRes.displacementHistory24h) {
+        this.displacementHistory24h = histRes.displacementHistory24h;
+      }
+
+      // 7. Fetch Alerts
+      const alertsRes = await fetch(`${API_BASE}/sites/${siteId}/alerts`).then(r => r.json());
+      if (alertsRes.success && alertsRes.alerts) {
+        this.alerts = alertsRes.alerts;
+      }
+
+      console.log('✅ Synchronized dataset with Mine Subsidence Backend API');
+    } catch (err) {
+      console.warn('⚠️ Backend REST API unavailable. Using fallback offline mock datasets:', err.message);
+    }
   }
 };
+

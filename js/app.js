@@ -4,10 +4,13 @@
 
 window.MineApp = (function () {
 
-  function initApp() {
+  async function initApp() {
     startClock();
     setupThemeToggle();
     setupSiteSelector();
+
+    // Fetch live REST API backend dataset
+    await window.MineData.loadFromBackend();
 
     // Render Panels
     renderKPIs();
