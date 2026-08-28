@@ -61,14 +61,23 @@ app.get(['/api', '/api/'], (req, res) => {
   });
 });
 
+const fs = require('fs');
+
 // Serve static frontend assets for root or non-API requests
-app.use('/css', express.static(path.join(__dirname, '..', 'css')));
-app.use('/js', express.static(path.join(__dirname, '..', 'js')));
-app.use(express.static(path.join(__dirname, '..')));
+const publicDir = path.join(__dirname, '..', 'public');
+const rootDir = path.join(__dirname, '..');
+
+if (fs.existsSync(publicDir)) {
+  app.use(express.static(publicDir));
+}
+app.use(express.static(rootDir));
 
 // Serve index.html for root page requests
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'index.html'));
+  if (fs.existsSync(path.join(publicDir, 'index.html'))) {
+    return res.sendFile(path.join(publicDir, 'index.html'));
+  }
+  res.sendFile(path.join(rootDir, 'index.html'));
 });
 
 // Centralized Error Handling Middleware
