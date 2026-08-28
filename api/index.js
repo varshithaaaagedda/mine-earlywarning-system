@@ -30,22 +30,43 @@ app.use(async (req, res, next) => {
   }
 });
 
-// Mount REST API Routes
-app.use('/api', healthRoutes);
+// Mount REST API Routes (supports both /api prefix and root subpaths for Vercel serverless compatibility)
 app.use('/api/sites', sitesRoutes);
+app.use('/sites', sitesRoutes);
+
+app.use('/api', healthRoutes);
+app.use('/', healthRoutes);
+
 app.use('/api', telemetryRoutes);
+app.use('/', telemetryRoutes);
+
 app.use('/api', zonesRoutes);
+app.use('/', zonesRoutes);
+
 app.use('/api', alertsRoutes);
+app.use('/', alertsRoutes);
+
 app.use('/api', sensorsRoutes);
+app.use('/', sensorsRoutes);
+
 app.use('/api', simulationRoutes);
+app.use('/', simulationRoutes);
 
 // Fallback health response for /api root
-app.get('/api', (req, res) => {
+app.get(['/api', '/api/'], (req, res) => {
   res.json({
     success: true,
     message: 'Mine Subsidence Early Warning System REST API Serverless Backend Running',
     health: '/api/health'
   });
+});
+
+// Serve static frontend assets for root or non-API requests
+app.use(express.static(path.join(__dirname, '..')));
+
+// Serve index.html for root page requests
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
 
 // Centralized Error Handling Middleware

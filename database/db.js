@@ -21,6 +21,7 @@ try {
   nativeDb = new sqlite3.Database(dbPath, (err) => {
     if (err) {
       console.warn('⚠️ Native SQLite load warning, switching to Pure JS engine:', err.message);
+      nativeDb = null;
       usePureJsStore = true;
     } else {
       console.log(`✅ Native SQLite Database connected at: ${dbPath}`);
