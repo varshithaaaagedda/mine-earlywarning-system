@@ -20,6 +20,17 @@ app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Ensure database initialization runs on serverless cold starts
+app.use(async (req, res, next) => {
+  try {
+    await initializeDatabase();
+    next();
+  } catch (err) {
+    console.error('❌ Database Initialization Middleware Error:', err.message);
+    next();
+  }
+});
+
 // Serve static frontend files
 app.use(express.static(__dirname));
 
@@ -51,18 +62,17 @@ app.use((req, res) => {
   res.status(404).json({ success: false, message: 'API Endpoint Not Found' });
 });
 
-// Initialize Database & Start Express Server
-async function startServer() {
-  try {
-    await initializeDatabase();
+// Export Express app for Vercel Serverless Functions
+module.exports = app;
+
+// Standalone local execution server listener
+if (require.main === module) {
+  initializeDatabase().then(() => {
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`🚀 Mine Subsidence Early Warning System Backend running at: http://localhost:${PORT}`);
       console.log(`📡 REST API Base URL: http://localhost:${PORT}/api`);
     });
-  } catch (err) {
+  }).catch((err) => {
     console.error('❌ Failed to start backend server:', err.message);
-    process.exit(1);
-  }
+  });
 }
-
-startServer();

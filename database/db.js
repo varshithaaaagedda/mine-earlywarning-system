@@ -3,12 +3,26 @@ const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
 
-const dbPath = process.env.DATABASE_PATH || path.join(__dirname, 'subsidence.db');
+// On Vercel Serverless environment, file system is read-only except /tmp
+let dbPath = process.env.DATABASE_PATH;
 
-// Ensure database directory exists
-const dbDir = path.dirname(dbPath);
-if (!fs.existsSync(dbDir)) {
-  fs.mkdirSync(dbDir, { recursive: true });
+if (!dbPath) {
+  if (process.env.VERCEL) {
+    dbPath = '/tmp/subsidence.db';
+  } else {
+    dbPath = path.join(__dirname, 'subsidence.db');
+  }
+}
+
+// Ensure target database directory exists
+try {
+  const dbDir = path.dirname(dbPath);
+  if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true });
+  }
+} catch (e) {
+  console.warn('⚠️ Warning: Cannot create DB directory, falling back to /tmp/subsidence.db');
+  dbPath = '/tmp/subsidence.db';
 }
 
 const db = new sqlite3.Database(dbPath, (err) => {
@@ -19,12 +33,12 @@ const db = new sqlite3.Database(dbPath, (err) => {
   }
 });
 
-// Promisify SQLite methods for easy async/await usage
+// Promisify SQLite methods for async/await usage
 const queryAll = (sql, params = []) => {
   return new Promise((resolve, reject) => {
     db.all(sql, params, (err, rows) => {
       if (err) reject(err);
-      else resolve(rows);
+      else resolve(rows || []);
     });
   });
 };
@@ -49,6 +63,7 @@ const queryRun = (sql, params = []) => {
 
 module.exports = {
   db,
+  dbPath,
   queryAll,
   queryGet,
   queryRun

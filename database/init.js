@@ -1,7 +1,12 @@
 const { queryRun, queryGet, queryAll } = require('./db');
 
+let initPromise = null;
+
 async function initializeDatabase() {
-  console.log('🔄 Initializing SQLite database schema...');
+  if (initPromise) return initPromise;
+
+  initPromise = (async () => {
+    console.log('🔄 Initializing SQLite database schema...');
 
   // 1. Sites Table
   await queryRun(`
@@ -326,6 +331,9 @@ async function initializeDatabase() {
 
     console.log('✅ SQLite Database initial seeding complete.');
   }
+  })();
+
+  return initPromise;
 }
 
 module.exports = { initializeDatabase };

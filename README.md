@@ -6,6 +6,7 @@
 [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![Leaflet GIS](https://img.shields.io/badge/Leaflet-199900?style=flat&logo=leaflet&logoColor=white)](https://leafletjs.com/)
 [![Chart.js](https://img.shields.io/badge/Chart.js-FF6384?style=flat&logo=chartdotjs&logoColor=white)](https://www.chartjs.org/)
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-000000?style=flat&logo=vercel&logoColor=white)](https://vercel.com)
 
 A **Real-Time GIS & Geotechnical Ground Stability Monitoring Dashboard** engineered to detect early signs of surface subsidence above underground coal mines, predict roof collapse hazards, and issue automated early warning alerts to safeguard mining personnel and nearby civil infrastructure.
 
