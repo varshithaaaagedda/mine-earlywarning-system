@@ -124,6 +124,58 @@ async function runTests() {
       }
     });
 
+    // 8. ML Model Prediction Endpoint
+    await assertTest('POST /api/ml/predict returns ML risk classification (Normal/Warning/Critical)', async () => {
+      const res = await makeRequest('POST', '/api/ml/predict', {
+        groundDisplacement: 14.8,
+        displacementRate: '+2.6 mm/hr',
+        tiltAngle: 2.8,
+        tiltRate: '+0.8°/hr',
+        crackWidth: 5.8,
+        crackRate: '+1.2 mm/hr'
+      });
+
+      if (res.status !== 200 || !res.body.prediction || res.body.prediction.riskClass !== 'Critical') {
+        throw new Error(`Expected Critical ML prediction, got ${res.body.prediction?.riskClass}`);
+      }
+    });
+
+    // 9. ML Model Info Endpoint
+    await assertTest('GET /api/ml/model-info returns ML diagnostics & metrics', async () => {
+      const res = await makeRequest('GET', '/api/ml/model-info');
+      if (res.status !== 200 || !res.body.model || !res.body.model.accuracy) {
+        throw new Error('Failed to fetch ML model diagnostic info');
+      }
+    });
+
+    // 10. Cybersecurity & 4-Layer Analysis Node Reading Endpoint
+    await assertTest('POST /api/ml/node-reading executes Cybersecurity & 4-Layer Server Logic Check', async () => {
+      const res = await makeRequest('POST', '/api/ml/node-reading', {
+        nodeId: 'Node_03',
+        seq: 105,
+        tilt: 0.40,
+        vibration: 0.09
+      });
+
+      if (res.status !== 200 || !res.body.cyberSecurity || !res.body.cyberSecurity.isValid) {
+        throw new Error('Cybersecurity & 4-Layer Node Reading execution failed');
+      }
+    });
+
+    // 11. Anti-Replay Security Verification
+    await assertTest('POST /api/ml/node-reading blocks replayed sequence numbers', async () => {
+      const res = await makeRequest('POST', '/api/ml/node-reading', {
+        nodeId: 'Node_03',
+        seq: 105, // Replayed sequence number 105 <= last_seen_seq 105
+        tilt: 0.40,
+        vibration: 0.09
+      });
+
+      if (res.status !== 401 || res.body.securityAlert?.reason !== 'REPLAY_ATTACK_DETECTED') {
+        throw new Error('Failed to block replayed sequence number');
+      }
+    });
+
   } finally {
     server.close();
   }

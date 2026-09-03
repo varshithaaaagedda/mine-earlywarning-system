@@ -20,6 +20,31 @@ window.MineData = {
     { id: "raniganj-m3", name: "Raniganj Coalfield - Mine #3", location: "Asansol, West Bengal" }
   ],
 
+  // Raniganj Coalfield Field Survey & PS-InSAR Telemetry Dataset
+  raniganjFieldData: {
+    gnssStations: [
+      { name: "RBUA", lat: 23.6614639671, lng: 87.1616919475, height: 43.34, displacement_mm: 12.0, rate_mm_yr: 5.71, risk: "Watch" },
+      { name: "RBUB", lat: 23.6612783551, lng: 87.1614920419, height: 43.75, displacement_mm: 124.6, rate_mm_yr: 117.43, risk: "Critical" },
+      { name: "RSMB", lat: 23.6668421453, lng: 87.1767764296, height: 52.91, displacement_mm: 12.4, rate_mm_yr: 5.90, risk: "Watch" },
+      { name: "RSSC", lat: 23.6379755936, lng: 87.2553597757, height: 35.72, displacement_mm: 73.8, rate_mm_yr: 68.97, risk: "Critical" }
+    ],
+    insarVelocity: [
+      { point: "P", psInSAR_asc: -7.78, psInSAR_desc: -10.14, sbas_desc: -7.78, pearson_asc_desc: 0.745, pearson_desc_sbas: 0.468 },
+      { point: "Q", psInSAR_asc: -8.17, psInSAR_desc: -10.57, sbas_desc: -13.34, pearson_asc_desc: 0.622, pearson_desc_sbas: 0.493 },
+      { point: "R", psInSAR_asc: -9.45, psInSAR_desc: -9.77, sbas_desc: -9.74, pearson_asc_desc: 0.874, pearson_desc_sbas: 0.716 },
+      { point: "S", psInSAR_asc: -10.25, psInSAR_desc: -15.01, sbas_desc: -18.39, pearson_asc_desc: 0.860, pearson_desc_sbas: 0.857 }
+    ],
+    geology: [
+      { age: "Tertiary", formation: "Tertiary sediment", lithology: "Sediments" },
+      { age: "Late Triassic", formation: "Supra panchet", lithology: "Pebbly sandstone" },
+      { age: "Early Triassic", formation: "Panchet", lithology: "Sandstone, shale and siltstone" },
+      { age: "Late Permian", formation: "Raniganj", lithology: "Sandstone, shale and coal seam" },
+      { age: "Middle Permian", formation: "Barren measure Barakar", lithology: "Sandstone, shale and coal seam" },
+      { age: "Early Permian", formation: "Talchir", lithology: "Tillites to boulder conglomerate" },
+      { age: "Archean", formation: "Crystalline basement", lithology: "Granite, granitic gneiss, hornblende schist" }
+    ]
+  },
+
   // System KPI Summaries
   kpis: {
     overallRiskScore: 68,

@@ -102,6 +102,19 @@ async function initializeDatabase() {
     );
   `);
 
+  // 5b. Cybersecurity Incident Logs Table
+  await queryRun(`
+    CREATE TABLE IF NOT EXISTS security_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+      node_id TEXT NOT NULL,
+      sequence_number INTEGER,
+      attack_type TEXT NOT NULL, -- HMAC_TAMPERING, REPLAY_ATTACK, FAULTY_NODE
+      message TEXT NOT NULL,
+      action_taken TEXT NOT NULL
+    );
+  `);
+
   // 6. Underground Tunnels Table
   await queryRun(`
     CREATE TABLE IF NOT EXISTS tunnels (
@@ -136,7 +149,7 @@ async function initializeDatabase() {
       { id: "singareni-s4", name: "Singareni Colliery - Shaft 4", location: "Kothagudem, Telangana, India", seam: "King Seam #3 (Depth: 240m)", center_lat: 17.5485, center_lng: 80.6120, zoom_level: 16 },
       { id: "jharia-b7", name: "Jharia Coalfield - Sector 7", location: "Dhanbad, Jharkhand, India", seam: "Seam IX/X (Depth: 310m)", center_lat: 23.7500, center_lng: 86.4167, zoom_level: 15 },
       { id: "korba-secb", name: "Korba Underground - Sector B", location: "Korba, Chhattisgarh, India", seam: "Gevra Deep Seam (Depth: 190m)", center_lat: 22.3500, center_lng: 82.6833, zoom_level: 15 },
-      { id: "raniganj-m3", name: "Raniganj Coalfield - Mine #3", location: "Asansol, West Bengal, India", seam: "Dishergarh Seam (Depth: 420m)", center_lat: 23.6833, center_lng: 86.9833, zoom_level: 15 }
+      { id: "raniganj-m3", name: "Raniganj Coalfield - Mine #3", location: "Asansol, West Bengal, India", seam: "Raniganj Seam (Late Permian, Depth: 420m)", center_lat: 23.6614, center_lng: 87.1616, zoom_level: 14 }
     ];
 
     for (const site of sites) {

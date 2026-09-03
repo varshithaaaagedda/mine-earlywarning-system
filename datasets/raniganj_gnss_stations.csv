@@ -1,0 +1,5 @@
+"Station name","Latitude","Longitude","Height(m)","Total displacement (mm)","Subsidence rate (mm/year)","risk_class"
+"RBUA",23.6614639671,87.1616919475,43.34391,12.0,5.71,"Watch"
+"RBUB",23.6612783551,87.1614920419,43.74513,124.6,117.43,"Critical"
+"RSMB",23.6668421453,87.1767764296,52.90890,12.4,5.90,"Watch"
+"RSSC",23.6379755936,87.2553597757,35.72368,73.8,68.97,"Critical"

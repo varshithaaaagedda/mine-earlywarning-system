@@ -11,6 +11,7 @@ const zonesRoutes = require('../routes/zones');
 const alertsRoutes = require('../routes/alerts');
 const sensorsRoutes = require('../routes/sensors');
 const simulationRoutes = require('../routes/simulation');
+const mlRoutes = require('../routes/ml');
 
 const app = express();
 
@@ -53,6 +54,9 @@ app.use('/', sensorsRoutes);
 
 app.use('/api', simulationRoutes);
 app.use('/', simulationRoutes);
+
+app.use('/api', mlRoutes);
+app.use('/', mlRoutes);
 
 // Fallback health response for /api root
 app.get(['/api', '/api/'], (req, res) => {

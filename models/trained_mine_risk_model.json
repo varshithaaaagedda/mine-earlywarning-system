@@ -1,0 +1,83 @@
+{
+  "modelName": "XGBoost / Gradient Boosted Decision Tree",
+  "trainedAt": "2026-09-03T17:53:18.578Z",
+  "dataset": "leakage_safe_mine_telemetry.csv",
+  "features": [
+    "tilt_angle_deg",
+    "tilt_rate_deg_hr",
+    "crack_width_mm",
+    "crack_rate_mm_hr",
+    "vibration_ppv_mms",
+    "soil_moisture_pct",
+    "signal_dbm",
+    "sensor_battery_pct",
+    "angular_crack_velocity_product",
+    "crack_expansion_ratio",
+    "moisture_weighted_tilt"
+  ],
+  "metrics": {
+    "accuracy": 0.912,
+    "macroPrecision": 0.8554,
+    "macroRecall": 0.8634,
+    "macroF1": 0.8591,
+    "criticalRecall": 1,
+    "confusionMatrix": [
+      [
+        353,
+        21,
+        0
+      ],
+      [
+        20,
+        42,
+        3
+      ],
+      [
+        0,
+        0,
+        61
+      ]
+    ]
+  },
+  "preprocessing": {
+    "means": [
+      1.2428199999999998,
+      0.2809350000000004,
+      2.5661699999999996,
+      0.3860849999999996,
+      1.3561800000000006,
+      38.548,
+      -72.7785,
+      80.1225,
+      0.24481449999999932,
+      0.2672094999999997,
+      0.676205500000001
+    ],
+    "stds": [
+      1.1823635429088644,
+      0.2934032647654086,
+      2.5535206737169784,
+      0.41692987752738586,
+      1.1365031929563576,
+      19.308151024891018,
+      7.143489185965081,
+      11.553765349443442,
+      0.4056430069528496,
+      0.5204004963580929,
+      0.8931984993660419
+    ],
+    "featureCols": [
+      "tilt_angle_deg",
+      "tilt_rate_deg_hr",
+      "crack_width_mm",
+      "crack_rate_mm_hr",
+      "vibration_ppv_mms",
+      "soil_moisture_pct",
+      "signal_dbm",
+      "sensor_battery_pct",
+      "angular_crack_velocity_product",
+      "crack_expansion_ratio",
+      "moisture_weighted_tilt"
+    ]
+  }
+}

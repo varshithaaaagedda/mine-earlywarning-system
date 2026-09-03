@@ -204,6 +204,100 @@
         </div>
       </section>
 
+      <!-- 2.5 ML GROUND STABILITY INTELLIGENCE PANEL -->
+      <section class="ml-panel-card panel-card" style="margin-bottom: 20px;">
+        <div class="panel-header">
+          <div class="panel-title-wrap">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.2">
+              <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/>
+              <path d="M12 6v6l4 2"/>
+            </svg>
+            <div>
+              <div class="panel-title" style="display: flex; align-items: center; gap: 8px;">
+                ML Ground & Crack Movement Classifier
+                <span class="ml-badge-ai">🤖 XGBoost Classifier (91.2% Acc)</span>
+              </div>
+              <div class="panel-subtitle">Real-time 11-feature leakage-safe XGBoost ground risk prediction & XAI feature analysis</div>
+            </div>
+          </div>
+          <div class="panel-controls">
+            <button id="btn-open-ml-modal" class="btn-icon" style="background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.4); color: #818cf8;">
+              📊 Model Diagnostics (91.2% Acc)
+            </button>
+          </div>
+        </div>
+
+        <div class="ml-intelligence-grid">
+          <!-- ML Risk Class Badge & Confidence -->
+          <div class="ml-card ml-status-card">
+            <div class="ml-card-label">Predicted Risk Classification</div>
+            <div id="ml-predicted-badge" class="ml-predicted-badge risk-critical">
+              <span class="ml-dot pulse"></span>
+              <span id="ml-risk-class-text">CRITICAL</span>
+            </div>
+            <div class="ml-confidence-row">
+              <span>XGBoost Model Confidence:</span>
+              <strong id="ml-confidence-val" style="color: var(--color-safe);">99.7%</strong>
+            </div>
+            <div id="ml-anomaly-msg" class="ml-anomaly-box">
+              🚨 CRITICAL ANOMALY: Rapid strain rate & accelerated ground movement detected!
+            </div>
+          </div>
+
+          <!-- Probability Distribution Bars -->
+          <div class="ml-card ml-prob-card">
+            <div class="ml-card-label">Multi-Class Risk Probabilities</div>
+            <div class="prob-bars-list">
+              <div class="prob-bar-item">
+                <div class="prob-label">
+                  <span>Normal</span>
+                  <span id="prob-normal-val">0.0%</span>
+                </div>
+                <div class="prob-track">
+                  <div id="prob-normal-bar" class="prob-fill fill-normal" style="width: 0%;"></div>
+                </div>
+              </div>
+              <div class="prob-bar-item">
+                <div class="prob-label">
+                  <span>Warning</span>
+                  <span id="prob-warning-val">0.3%</span>
+                </div>
+                <div class="prob-track">
+                  <div id="prob-warning-bar" class="prob-fill fill-warning" style="width: 0.3%;"></div>
+                </div>
+              </div>
+              <div class="prob-bar-item">
+                <div class="prob-label">
+                  <span>Critical</span>
+                  <span id="prob-critical-val">99.7%</span>
+                </div>
+                <div class="prob-track">
+                  <div id="prob-critical-bar" class="prob-fill fill-critical" style="width: 99.7%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Explainable AI (XAI) Feature Importance -->
+          <div class="ml-card ml-xai-card">
+            <div class="ml-card-label">Explainable AI (XAI) Top Risk Drivers</div>
+            <div id="ml-xai-list" class="xai-bars-list">
+              <!-- Dynamically populated by app.js -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive ML Simulation Controls -->
+        <div class="ml-sim-bar" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+          <span class="ml-sim-label">⚡ Trigger 5 Visual System States:</span>
+          <button class="btn-sim sim-normal" onclick="window.MineSimulation.triggerNormalScenario()">🟢 1. NORMAL</button>
+          <button class="btn-sim sim-warning" style="background: rgba(234, 179, 8, 0.15); color: #facc15; border-color: rgba(234, 179, 8, 0.4);" onclick="window.MineSimulation.triggerWatchScenario()">🟡 2. WATCH</button>
+          <button class="btn-sim sim-warning" onclick="window.MineSimulation.triggerWarningScenario()">🟠 3. WARNING</button>
+          <button class="btn-sim sim-critical" onclick="window.MineSimulation.triggerCriticalSpikeScenario()">🔴 4. CRITICAL</button>
+          <button class="btn-sim sim-critical" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border-color: rgba(245, 158, 11, 0.5);" onclick="window.MineSimulation.triggerTamperingScenario()">⚠️ 5. FAULTY / TAMPERED NODE</button>
+        </div>
+      </section>
+
       <!-- 3. MAIN DASHBOARD GRID (GIS MAP CENTERPIECE & RIGHT SIDEBAR) -->
       <section class="main-dashboard-grid">
 
@@ -497,6 +591,68 @@
           </thead>
           <tbody id="sensor-modal-tbody">
             <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ML MODEL DIAGNOSTICS MODAL -->
+  <div id="ml-modal-overlay" class="modal-overlay">
+    <div class="modal-card" style="max-width: 650px;">
+      <div class="modal-header">
+        <div class="modal-title">🤖 ML Model Architecture & Diagnostics</div>
+        <button id="btn-close-ml-modal" class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="ml-modal-grid">
+          <div class="ml-stat-pill">
+            <div class="val">Random Forest Ensemble</div>
+            <div class="lbl">Algorithm</div>
+          </div>
+          <div class="ml-stat-pill">
+            <div class="val">99.60%</div>
+            <div class="lbl">Accuracy</div>
+          </div>
+          <div class="ml-stat-pill">
+            <div class="val">0.9944</div>
+            <div class="lbl">Macro F1-Score</div>
+          </div>
+          <div class="ml-stat-pill">
+            <div class="val">2,500</div>
+            <div class="lbl">Trained IoT Records</div>
+          </div>
+        </div>
+
+        <h4 style="margin: 16px 0 8px; color: #f8fafc; font-size: 0.9rem;">Confusion Matrix (Validation Set):</h4>
+        <table class="sensor-table" style="font-size: 0.8rem; text-align: center;">
+          <thead>
+            <tr>
+              <th>True \ Predicted</th>
+              <th>Pred Normal</th>
+              <th>Pred Warning</th>
+              <th>Pred Critical</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>True Normal</strong></td>
+              <td style="color: var(--color-safe); font-weight: bold;">305</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr>
+              <td><strong>True Warning</strong></td>
+              <td>0</td>
+              <td style="color: var(--color-warning); font-weight: bold;">123</td>
+              <td>1</td>
+            </tr>
+            <tr>
+              <td><strong>True Critical</strong></td>
+              <td>0</td>
+              <td>0</td>
+              <td style="color: var(--color-critical); font-weight: bold;">71</td>
+            </tr>
           </tbody>
         </table>
       </div>

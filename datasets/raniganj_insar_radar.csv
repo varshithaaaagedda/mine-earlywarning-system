@@ -1,0 +1,5 @@
+"Feature_point","PS_InSAR_ascending_mm_yr","PS_InSAR_descending_mm_yr","SBAS_descending_mm_yr","Pearson_asc_desc","Pearson_desc_sbas","Pearson_sbas_asc"
+"P",-7.78,-10.14,-7.78,0.745,0.468,0.473
+"Q",-8.17,-10.57,-13.34,0.622,0.493,0.564
+"R",-9.45,-9.77,-9.74,0.874,0.716,0.686
+"S",-10.25,-15.01,-18.39,0.860,0.857,0.768

@@ -124,10 +124,101 @@ window.MineSimulation = (function () {
     }
   }
 
+  // Trigger Normal Baseline Scenario
+  function triggerNormalScenario() {
+    const t = window.MineData.telemetry;
+    t.groundDisplacement = 1.8;
+    t.displacementRate = "+0.2 mm/hr";
+    t.tiltAngle = 0.2;
+    t.tiltRate = "+0.05°/hr";
+    t.crackWidth = 0.5;
+    t.crackRate = "+0.05 mm";
+    t.vibrationPPV = 0.6;
+    t.soilMoisture = 22;
+    t.vibrationStatus = "Normal Baseline";
+
+    window.MineApp.updateTelemetryUI();
+    window.MineApp.showNotification("🟢 ML Scenario: Baseline Normal state injected.");
+  }
+
+  // Trigger Warning Creep Scenario
+  function triggerWarningScenario() {
+    const t = window.MineData.telemetry;
+    t.groundDisplacement = 8.5;
+    t.displacementRate = "+1.4 mm/hr";
+    t.tiltAngle = 1.6;
+    t.tiltRate = "+0.25°/hr";
+    t.crackWidth = 3.4;
+    t.crackRate = "+0.45 mm";
+    t.vibrationPPV = 1.8;
+    t.soilMoisture = 48;
+    t.vibrationStatus = "Elevated Creep";
+
+    window.MineApp.updateTelemetryUI();
+    window.MineApp.showNotification("🟡 ML Scenario: Warning progressive creep state injected.");
+  }
+
+  // Trigger Critical Spike Scenario
+  function triggerCriticalSpikeScenario() {
+    const t = window.MineData.telemetry;
+    t.groundDisplacement = 18.5;
+    t.displacementRate = "+3.8 mm/hr (RAPID)";
+    t.tiltAngle = 3.8;
+    t.tiltRate = "+0.65°/hr";
+    t.crackWidth = 7.2;
+    t.crackRate = "+1.2 mm";
+    t.vibrationPPV = 3.2;
+    t.soilMoisture = 75;
+    t.vibrationStatus = "Critical Strata Movement";
+
+    window.MineApp.updateTelemetryUI();
+    window.MineChart.addDataPoint(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), t.groundDisplacement);
+    window.MineApp.showNotification("🔴 ML Scenario: Critical slope deformation spike injected!");
+  }
+
+  // Trigger Watch Scenario (Subtle deformation / elevated caution)
+  function triggerWatchScenario() {
+    const t = window.MineData.telemetry;
+    t.groundDisplacement = 4.2;
+    t.displacementRate = "+0.8 mm/hr";
+    t.tiltAngle = 0.9;
+    t.tiltRate = "+0.15°/hr";
+    t.crackWidth = 1.8;
+    t.crackRate = "+0.20 mm/hr";
+    t.vibrationPPV = 1.1;
+    t.soilMoisture = 35;
+    t.signalStrength = -70;
+
+    window.MineApp.updateTelemetryUI();
+    window.MineApp.showNotification("🟡 ML Scenario: WATCH level subtle strain acceleration detected.");
+  }
+
+  // Trigger Sensor Tampering / Neighbor Disagreement Scenario
+  function triggerTamperingScenario() {
+    const t = window.MineData.telemetry;
+    t.groundDisplacement = 18.5;
+    t.tiltAngle = 3.4;
+    t.tiltRate = "+0.65°/hr";
+    t.crackWidth = 7.2;
+    t.crackRate = "+1.20 mm/hr";
+    t.vibrationPPV = 2.8;
+    t.soilMoisture = 65;
+    t.signalStrength = -68;
+
+    window.MineApp.updateTelemetryUI();
+    window.MineApp.showNotification("⚠️ SECURITY ALERT: Node 03 Possible Sensor Tampering - Neighboring nodes disagree. Evacuation NOT triggered.");
+  }
+
   return {
     initSimulation,
     triggerRainSimulation,
     triggerDisplacementSpike,
-    resetSimulation
+    resetSimulation,
+    triggerNormalScenario,
+    triggerWatchScenario,
+    triggerWarningScenario,
+    triggerCriticalSpikeScenario,
+    triggerTamperingScenario
   };
 })();
+

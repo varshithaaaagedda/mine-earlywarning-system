@@ -1,75 +1,50 @@
 const { queryRun } = require('../database/db');
+const { predictMineRisk } = require('./mlClassifier');
 
 /**
- * Risk Level Evaluation & Alert Generator Service
+ * Combined Hybrid Risk Decision Rule:
+ * Final Risk Level = Max(XGBoost_ML_Prediction, Physical_Safety_Override)
+ * 
+ * Rule 1: XGBoost Model generates predicted class (Normal, Warning, Critical) & class probabilities.
+ * Rule 2: If physical safety threshold is breached (cumulative displacement >= 15mm or annual subsidence rate >= 30mm/yr),
+ *         the system IMMEDIATELY overrides the final decision to CRITICAL.
+ * Rule 3: ML prediction ALONE cannot bypass or downgrade a critical physical safety rule.
  */
 function calculateRiskLevel(telemetry) {
+  // Execute XGBoost ML Model Prediction (11 Leakage-Safe Features)
+  const mlResult = predictMineRisk(telemetry);
+
   const disp = parseFloat(telemetry.groundDisplacement || telemetry.ground_displacement_mm || 0);
-  const tilt = parseFloat(telemetry.tiltAngle || telemetry.tilt_angle_deg || 0);
-  const crack = parseFloat(telemetry.crackWidth || telemetry.crack_width_mm || 0);
-  const vib = parseFloat(telemetry.vibrationPPV || telemetry.vibration_ppv_mms || 0);
+  const subRate = parseFloat(telemetry.subsidenceRate || telemetry.rate_mm_yr || 0);
 
-  let riskScore = 15;
-  let riskLevel = "SAFE";
+  let riskScore = mlResult.riskScore;
+  let riskLevel = mlResult.riskClass.toUpperCase(); // "NORMAL", "WARNING", "CRITICAL"
 
-  // Displacement factor (Weight: 50%)
-  if (disp >= 15.0) {
-    riskScore += 45;
-  } else if (disp >= 12.0) {
-    riskScore += 30;
-  } else if (disp >= 5.0) {
-    riskScore += 15;
-  }
-
-  // Tilt factor (Weight: 25%)
-  if (tilt >= 3.0) {
-    riskScore += 25;
-  } else if (tilt >= 1.5) {
-    riskScore += 15;
-  } else if (tilt >= 0.5) {
-    riskScore += 5;
-  }
-
-  // Crack factor (Weight: 15%)
-  if (crack >= 5.0) {
-    riskScore += 15;
-  } else if (crack >= 2.0) {
-    riskScore += 8;
-  }
-
-  // Vibration factor (Weight: 10%)
-  if (vib >= 3.0) {
-    riskScore += 10;
-  } else if (vib >= 1.5) {
-    riskScore += 5;
-  }
-
-  // Cap score between 0 and 100
-  riskScore = Math.min(100, Math.max(0, Math.round(riskScore)));
-
-  if (riskScore >= 75 || disp >= 15.0) {
+  // Physical Safety Override Rule (Fail-Safe: ML cannot bypass physical threshold)
+  if (disp >= 15.0 || subRate >= 30.0) {
     riskLevel = "CRITICAL";
-  } else if (riskScore >= 50 || disp >= 12.0 || tilt >= 2.0) {
-    riskLevel = "WARNING";
-  } else if (riskScore >= 30 || disp >= 5.0) {
+    riskScore = Math.max(riskScore, 98);
+  } else if (riskLevel === "NORMAL" && disp >= 5.0) {
     riskLevel = "WATCH";
-  } else {
-    riskLevel = "SAFE";
   }
 
-  return { riskScore, riskLevel };
+  return {
+    riskScore,
+    riskLevel,
+    mlPrediction: mlResult
+  };
 }
 
 async function processTelemetryAndAlerts(siteId, zoneId, telemetry) {
-  const { riskScore, riskLevel } = calculateRiskLevel(telemetry);
+  const { riskScore, riskLevel, mlPrediction } = calculateRiskLevel(telemetry);
 
   // If CRITICAL or WARNING risk level detected, automatically record an alert in DB
-  if (riskLevel === "CRITICAL" || riskLevel === "WARNING") {
+  if (riskLevel === "CRITICAL" || riskLevel === "WARNING" || mlPrediction.riskClass === "Critical" || mlPrediction.riskClass === "Warning") {
     const alertId = `ALT-${Math.floor(100 + Math.random() * 900)}`;
-    const severity = riskLevel.toLowerCase();
-    const title = riskLevel === "CRITICAL"
-      ? `Accelerated Ground Deformation (${telemetry.groundDisplacement || telemetry.ground_displacement_mm} mm)`
-      : `Elevated Subsidence & Strain Detected (${telemetry.groundDisplacement || telemetry.ground_displacement_mm} mm)`;
+    const severity = (mlPrediction.riskClass || riskLevel).toLowerCase();
+    const title = mlPrediction.riskClass === "Critical" || riskLevel === "CRITICAL"
+      ? `ML ALERT: Accelerated Ground Deformation (${telemetry.groundDisplacement || telemetry.ground_displacement_mm} mm)`
+      : `ML ALERT: Elevated Subsidence & Crack Expansion (${telemetry.groundDisplacement || telemetry.ground_displacement_mm} mm)`;
     const location = `Zone ${zoneId ? zoneId.toUpperCase().replace('ZONE-', '') : 'A'} — Active Extraction Panel`;
 
     try {
@@ -83,10 +58,11 @@ async function processTelemetryAndAlerts(siteId, zoneId, telemetry) {
     }
   }
 
-  return { riskScore, riskLevel };
+  return { riskScore, riskLevel, mlPrediction };
 }
 
 module.exports = {
   calculateRiskLevel,
   processTelemetryAndAlerts
 };
+

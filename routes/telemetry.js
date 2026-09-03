@@ -166,11 +166,25 @@ router.post('/telemetry/ingest', async (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Telemetry ingested successfully',
-      readingId: result.id,
+      readingId: result.lastID,
       evaluatedRisk: {
         riskScore,
         riskLevel
       }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// GET /api/security/logs - Query Cybersecurity Incident Log Audit Table
+router.get('/security/logs', async (req, res) => {
+  try {
+    const logs = await queryAll(`SELECT * FROM security_logs ORDER BY id DESC LIMIT 50;`);
+    res.json({
+      success: true,
+      count: logs.length,
+      logs
     });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
