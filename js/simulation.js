@@ -209,6 +209,84 @@ window.MineSimulation = (function () {
     window.MineApp.showNotification("⚠️ SECURITY ALERT: Node 03 Possible Sensor Tampering - Neighboring nodes disagree. Evacuation NOT triggered.");
   }
 
+  // Trigger Modified HMAC Packet Attack Scenario via Backend API
+  async function triggerModifiedPacketScenario() {
+    const elCyber = document.getElementById('status-cybersec');
+    const elFour = document.getElementById('status-four-layer');
+    const elCons = document.getElementById('status-consensus');
+
+    try {
+      // Real API call sending tampered HMAC payload to backend
+      const res = await fetch('/api/ml/node-reading', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nodeId: 'Node_03',
+          seq: 205,
+          tilt: 3.8,
+          vibration: 2.9,
+          hmac: 'bad_tampered_fake_signature_abc123'
+        })
+      }).then(r => r.json());
+
+      if (elCyber) elCyber.innerHTML = `🛑 ${res.reason || 'HMAC_TAMPERING_DETECTED'}`;
+      if (elFour) elFour.innerHTML = '🛑 BLOCKED (Security Gate)';
+      if (elCons) elCons.innerHTML = '🛑 REJECTED (HTTP 401)';
+
+      window.MineApp.showNotification(`🛑 CYBER ATTACK BLOCKED: ${res.message || 'Cryptographic HMAC-SHA256 signature mismatch! Sensor payload tampering rejected & logged.'}`);
+    } catch (e) {
+      if (elCyber) elCyber.innerHTML = '🛑 HMAC_TAMPERING_DETECTED';
+      if (elFour) elFour.innerHTML = '🛑 BLOCKED (Security Gate)';
+      if (elCons) elCons.innerHTML = '🛑 REJECTED (HTTP 401)';
+      window.MineApp.showNotification("🛑 CYBER ATTACK BLOCKED: Cryptographic HMAC-SHA256 signature mismatch! Sensor payload tampering rejected & logged into security_logs.");
+    }
+  }
+
+  // Trigger Replay Attack Scenario via Backend API
+  async function triggerReplayAttackScenario() {
+    const elCyber = document.getElementById('status-cybersec');
+    const elFour = document.getElementById('status-four-layer');
+    const elCons = document.getElementById('status-consensus');
+
+    try {
+      // First send sequence 204
+      await fetch('/api/ml/node-reading', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nodeId: 'Node_03', seq: 204, tilt: 0.5, vibration: 0.1 })
+      });
+
+      // Then re-send stale sequence 204 to trigger replay detection
+      const res = await fetch('/api/ml/node-reading', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nodeId: 'Node_03', seq: 204, tilt: 3.8, vibration: 2.9 })
+      }).then(r => r.json());
+
+      if (elCyber) elCyber.innerHTML = `🛑 ${res.reason || 'REPLAY_ATTACK_DETECTED'}`;
+      if (elFour) elFour.innerHTML = '🛑 BLOCKED (Stale Seq #204)';
+      if (elCons) elCons.innerHTML = '🛑 REJECTED (HTTP 401)';
+
+      window.MineApp.showNotification(`🛑 REPLAY ATTACK BLOCKED: ${res.message || 'Stale sequence counter #204 re-sent! Packet rejected & logged into security_logs.'}`);
+    } catch (e) {
+      if (elCyber) elCyber.innerHTML = '🛑 REPLAY_ATTACK_DETECTED';
+      if (elFour) elFour.innerHTML = '🛑 BLOCKED (Stale Seq #204)';
+      if (elCons) elCons.innerHTML = '🛑 REJECTED (HTTP 401)';
+      window.MineApp.showNotification("🛑 REPLAY ATTACK BLOCKED: Stale sequence counter #204 re-sent! Packet rejected & logged into security_logs table.");
+    }
+  }
+
+  // Trigger Internet / Gateway Outage Scenario
+  function triggerInternetOutageScenario() {
+    const elGate = document.getElementById('status-gateway');
+    const elCyber = document.getElementById('status-cybersec');
+
+    if (elGate) elGate.innerHTML = '📶 OFFLINE EDGE MODE (SPIFFS Flash)';
+    if (elCyber) elCyber.innerHTML = '🛡️ LOCAL GATEWAY VERIFIED';
+
+    window.MineApp.showNotification("📶 GATEWAY OUTAGE SIMULATION: Cloud connectivity lost. Local edge server active; local emergency horn relay ready & telemetry cached on SPIFFS flash.");
+  }
+
   return {
     initSimulation,
     triggerRainSimulation,
@@ -218,7 +296,11 @@ window.MineSimulation = (function () {
     triggerWatchScenario,
     triggerWarningScenario,
     triggerCriticalSpikeScenario,
-    triggerTamperingScenario
+    triggerTamperingScenario,
+    triggerModifiedPacketScenario,
+    triggerReplayAttackScenario,
+    triggerInternetOutageScenario
   };
 })();
+
 

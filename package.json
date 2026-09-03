@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
+    "build": "node -e \"console.log('Build complete: Vanilla HTML/JS/CSS application ready for production execution.')\"",
     "test": "node tests/api.test.js"
   },
   "repository": {

@@ -287,14 +287,55 @@
           </div>
         </div>
 
-        <!-- Interactive ML Simulation Controls -->
-        <div class="ml-sim-bar" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-          <span class="ml-sim-label">⚡ Trigger 5 Visual System States:</span>
+        <!-- Interactive ML & Cyber Simulation Controls -->
+        <div class="ml-sim-bar" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 12px;">
+          <span class="ml-sim-label" style="font-weight: 700; color: #818cf8;">⚡ Hackathon Scenario Demonstrator:</span>
           <button class="btn-sim sim-normal" onclick="window.MineSimulation.triggerNormalScenario()">🟢 1. NORMAL</button>
-          <button class="btn-sim sim-warning" style="background: rgba(234, 179, 8, 0.15); color: #facc15; border-color: rgba(234, 179, 8, 0.4);" onclick="window.MineSimulation.triggerWatchScenario()">🟡 2. WATCH</button>
-          <button class="btn-sim sim-warning" onclick="window.MineSimulation.triggerWarningScenario()">🟠 3. WARNING</button>
-          <button class="btn-sim sim-critical" onclick="window.MineSimulation.triggerCriticalSpikeScenario()">🔴 4. CRITICAL</button>
-          <button class="btn-sim sim-critical" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border-color: rgba(245, 158, 11, 0.5);" onclick="window.MineSimulation.triggerTamperingScenario()">⚠️ 5. FAULTY / TAMPERED NODE</button>
+          <button class="btn-sim sim-warning" onclick="window.MineSimulation.triggerWarningScenario()">🟡 2. WARNING</button>
+          <button class="btn-sim sim-warning" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border-color: rgba(245, 158, 11, 0.5);" onclick="window.MineSimulation.triggerTamperingScenario()">⚠️ 3. SINGLE FAULTY NODE</button>
+          <button class="btn-sim sim-critical" onclick="window.MineSimulation.triggerCriticalSpikeScenario()">🔴 4. GENUINE FAILURE</button>
+          <button class="btn-sim sim-critical" style="background: rgba(239, 68, 68, 0.25); color: #f87171; border-color: rgba(239, 68, 68, 0.6);" onclick="window.MineSimulation.triggerModifiedPacketScenario()">🛡️ 5. MODIFIED PACKET</button>
+          <button class="btn-sim sim-critical" style="background: rgba(168, 85, 247, 0.2); color: #c084fc; border-color: rgba(168, 85, 247, 0.5);" onclick="window.MineSimulation.triggerReplayAttackScenario()">🔁 6. REPLAY ATTACK</button>
+          <button class="btn-sim sim-warning" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; border-color: rgba(59, 130, 246, 0.5);" onclick="window.MineSimulation.triggerInternetOutageScenario()">📶 7. INTERNET OUTAGE</button>
+        </div>
+
+        <!-- 15-METRIC CYBER-PHYSICAL SECURITY & 4-LAYER STATUS RIBBON -->
+        <div class="security-ribbon-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; font-family: var(--font-mono);">
+          <!-- 1. Cybersecurity & Auth Status -->
+          <div class="sec-stat-card" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 6px; padding: 10px;">
+            <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">12. Cybersecurity Status</div>
+            <div id="status-cybersec" style="font-weight: 800; color: #34d399; font-size: 0.85rem; margin-top: 2px;">
+              🛡️ HMAC-SHA256 Valid (Seq #204)
+            </div>
+            <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 2px;">Anti-Replay Counter Active</div>
+          </div>
+
+          <!-- 2. 4-Layer Detection Engine Status -->
+          <div class="sec-stat-card" style="background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 6px; padding: 10px;">
+            <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">10. 4-Layer Analysis Status</div>
+            <div id="status-four-layer" style="font-weight: 800; color: #818cf8; font-size: 0.85rem; margin-top: 2px;">
+              L1: Pass • L2: Trend • L3: Agree
+            </div>
+            <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 2px;">Isolation Forest Distance: 0.12</div>
+          </div>
+
+          <!-- 3. Cross-Node Spatial Consensus Status -->
+          <div class="sec-stat-card" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px; padding: 10px;">
+            <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">11. Cross-Node Consensus</div>
+            <div id="status-consensus" style="font-weight: 800; color: #fbbf24; font-size: 0.85rem; margin-top: 2px;">
+              CONFIRMED (Node_04 Agrees)
+            </div>
+            <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 2px;">Fault Isolation: Normal</div>
+          </div>
+
+          <!-- 4. Gateway & Connectivity Status -->
+          <div class="sec-stat-card" style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 6px; padding: 10px;">
+            <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">15. Gateway / Internet Status</div>
+            <div id="status-gateway" style="font-weight: 800; color: #60a5fa; font-size: 0.85rem; margin-top: 2px;">
+              🟢 GATEWAY ONLINE (Cloud Sync)
+            </div>
+            <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 2px;">Edge SPIFFS Buffer Ready</div>
+          </div>
         </div>
       </section>
 

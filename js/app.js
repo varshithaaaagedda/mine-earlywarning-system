@@ -200,6 +200,29 @@ window.MineApp = (function () {
         xaiList.appendChild(row);
       });
     }
+
+    // Update Security & 4-Layer Status Ribbon Cards
+    const elCyber = document.getElementById('status-cybersec');
+    const elFour = document.getElementById('status-four-layer');
+    const elCons = document.getElementById('status-consensus');
+    const elGate = document.getElementById('status-gateway');
+
+    if (riskClass === 'Critical') {
+      if (elCyber) elCyber.innerHTML = '🛡️ HMAC-SHA256 Valid (Seq #204)';
+      if (elFour) elFour.innerHTML = 'L1: Outlier • L2: Sustained • L3: Agree';
+      if (elCons) elCons.innerHTML = '🔴 CONFIRMED (Node_04 Agrees)';
+      if (elGate) elGate.innerHTML = '🟢 GATEWAY ONLINE (Cloud Sync)';
+    } else if (riskClass === 'Warning') {
+      if (elCyber) elCyber.innerHTML = '🛡️ HMAC-SHA256 Valid (Seq #202)';
+      if (elFour) elFour.innerHTML = 'L1: Creep • L2: Elevated • L3: Caution';
+      if (elCons) elCons.innerHTML = '🟠 WARNING (Single Node Creep)';
+      if (elGate) elGate.innerHTML = '🟢 GATEWAY ONLINE (Cloud Sync)';
+    } else {
+      if (elCyber) elCyber.innerHTML = '🛡️ HMAC-SHA256 Valid (Seq #201)';
+      if (elFour) elFour.innerHTML = 'L1: Normal • L2: Safe • L3: Baseline';
+      if (elCons) elCons.innerHTML = '🟢 NORMAL (Isolated Baseline)';
+      if (elGate) elGate.innerHTML = '🟢 GATEWAY ONLINE (Cloud Sync)';
+    }
   }
 
   // Render Active Alerts Stream Panel
