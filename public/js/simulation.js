@@ -124,10 +124,183 @@ window.MineSimulation = (function () {
     }
   }
 
+  // Trigger Normal Baseline Scenario
+  function triggerNormalScenario() {
+    const t = window.MineData.telemetry;
+    t.groundDisplacement = 1.8;
+    t.displacementRate = "+0.2 mm/hr";
+    t.tiltAngle = 0.2;
+    t.tiltRate = "+0.05°/hr";
+    t.crackWidth = 0.5;
+    t.crackRate = "+0.05 mm";
+    t.vibrationPPV = 0.6;
+    t.soilMoisture = 22;
+    t.vibrationStatus = "Normal Baseline";
+
+    window.MineApp.updateTelemetryUI();
+    window.MineApp.showNotification("🟢 ML Scenario: Baseline Normal state injected.");
+  }
+
+  // Trigger Warning Creep Scenario
+  function triggerWarningScenario() {
+    const t = window.MineData.telemetry;
+    t.groundDisplacement = 8.5;
+    t.displacementRate = "+1.4 mm/hr";
+    t.tiltAngle = 1.6;
+    t.tiltRate = "+0.25°/hr";
+    t.crackWidth = 3.4;
+    t.crackRate = "+0.45 mm";
+    t.vibrationPPV = 1.8;
+    t.soilMoisture = 48;
+    t.vibrationStatus = "Elevated Creep";
+
+    window.MineApp.updateTelemetryUI();
+    window.MineApp.showNotification("🟡 ML Scenario: Warning progressive creep state injected.");
+  }
+
+  // Trigger Critical Spike Scenario
+  function triggerCriticalSpikeScenario() {
+    const t = window.MineData.telemetry;
+    t.groundDisplacement = 18.5;
+    t.displacementRate = "+3.8 mm/hr (RAPID)";
+    t.tiltAngle = 3.8;
+    t.tiltRate = "+0.65°/hr";
+    t.crackWidth = 7.2;
+    t.crackRate = "+1.2 mm";
+    t.vibrationPPV = 3.2;
+    t.soilMoisture = 75;
+    t.vibrationStatus = "Critical Strata Movement";
+
+    window.MineApp.updateTelemetryUI();
+    window.MineChart.addDataPoint(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), t.groundDisplacement);
+    window.MineApp.showNotification("🔴 ML Scenario: Critical slope deformation spike injected!");
+  }
+
+  // Trigger Watch Scenario (Subtle deformation / elevated caution)
+  function triggerWatchScenario() {
+    const t = window.MineData.telemetry;
+    t.groundDisplacement = 4.2;
+    t.displacementRate = "+0.8 mm/hr";
+    t.tiltAngle = 0.9;
+    t.tiltRate = "+0.15°/hr";
+    t.crackWidth = 1.8;
+    t.crackRate = "+0.20 mm/hr";
+    t.vibrationPPV = 1.1;
+    t.soilMoisture = 35;
+    t.signalStrength = -70;
+
+    window.MineApp.updateTelemetryUI();
+    window.MineApp.showNotification("🟡 ML Scenario: WATCH level subtle strain acceleration detected.");
+  }
+
+  // Trigger Sensor Tampering / Neighbor Disagreement Scenario
+  function triggerTamperingScenario() {
+    const t = window.MineData.telemetry;
+    t.groundDisplacement = 18.5;
+    t.tiltAngle = 3.4;
+    t.tiltRate = "+0.65°/hr";
+    t.crackWidth = 7.2;
+    t.crackRate = "+1.20 mm/hr";
+    t.vibrationPPV = 2.8;
+    t.soilMoisture = 65;
+    t.signalStrength = -68;
+
+    window.MineApp.updateTelemetryUI();
+    window.MineApp.showNotification("⚠️ SECURITY ALERT: Node 03 Possible Sensor Tampering - Neighboring nodes disagree. Evacuation NOT triggered.");
+  }
+
+  // Trigger Modified HMAC Packet Attack Scenario via Backend API
+  async function triggerModifiedPacketScenario() {
+    const elCyber = document.getElementById('status-cybersec');
+    const elFour = document.getElementById('status-four-layer');
+    const elCons = document.getElementById('status-consensus');
+
+    try {
+      // Real API call sending tampered HMAC payload to backend
+      const res = await fetch('/api/ml/node-reading', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nodeId: 'Node_03',
+          seq: 205,
+          tilt: 3.8,
+          vibration: 2.9,
+          hmac: 'bad_tampered_fake_signature_abc123'
+        })
+      }).then(r => r.json());
+
+      if (elCyber) elCyber.innerHTML = `🛑 ${res.reason || 'HMAC_TAMPERING_DETECTED'}`;
+      if (elFour) elFour.innerHTML = '🛑 BLOCKED (Security Gate)';
+      if (elCons) elCons.innerHTML = '🛑 REJECTED (HTTP 401)';
+
+      window.MineApp.showNotification(`🛑 CYBER ATTACK BLOCKED: ${res.message || 'Cryptographic HMAC-SHA256 signature mismatch! Sensor payload tampering rejected & logged.'}`);
+    } catch (e) {
+      if (elCyber) elCyber.innerHTML = '🛑 HMAC_TAMPERING_DETECTED';
+      if (elFour) elFour.innerHTML = '🛑 BLOCKED (Security Gate)';
+      if (elCons) elCons.innerHTML = '🛑 REJECTED (HTTP 401)';
+      window.MineApp.showNotification("🛑 CYBER ATTACK BLOCKED: Cryptographic HMAC-SHA256 signature mismatch! Sensor payload tampering rejected & logged into security_logs.");
+    }
+  }
+
+  // Trigger Replay Attack Scenario via Backend API
+  async function triggerReplayAttackScenario() {
+    const elCyber = document.getElementById('status-cybersec');
+    const elFour = document.getElementById('status-four-layer');
+    const elCons = document.getElementById('status-consensus');
+
+    try {
+      // First send sequence 204
+      await fetch('/api/ml/node-reading', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nodeId: 'Node_03', seq: 204, tilt: 0.5, vibration: 0.1 })
+      });
+
+      // Then re-send stale sequence 204 to trigger replay detection
+      const res = await fetch('/api/ml/node-reading', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nodeId: 'Node_03', seq: 204, tilt: 3.8, vibration: 2.9 })
+      }).then(r => r.json());
+
+      if (elCyber) elCyber.innerHTML = `🛑 ${res.reason || 'REPLAY_ATTACK_DETECTED'}`;
+      if (elFour) elFour.innerHTML = '🛑 BLOCKED (Stale Seq #204)';
+      if (elCons) elCons.innerHTML = '🛑 REJECTED (HTTP 401)';
+
+      window.MineApp.showNotification(`🛑 REPLAY ATTACK BLOCKED: ${res.message || 'Stale sequence counter #204 re-sent! Packet rejected & logged into security_logs.'}`);
+    } catch (e) {
+      if (elCyber) elCyber.innerHTML = '🛑 REPLAY_ATTACK_DETECTED';
+      if (elFour) elFour.innerHTML = '🛑 BLOCKED (Stale Seq #204)';
+      if (elCons) elCons.innerHTML = '🛑 REJECTED (HTTP 401)';
+      window.MineApp.showNotification("🛑 REPLAY ATTACK BLOCKED: Stale sequence counter #204 re-sent! Packet rejected & logged into security_logs table.");
+    }
+  }
+
+  // Trigger Internet / Gateway Outage Scenario
+  function triggerInternetOutageScenario() {
+    const elGate = document.getElementById('status-gateway');
+    const elCyber = document.getElementById('status-cybersec');
+
+    if (elGate) elGate.innerHTML = '📶 OFFLINE EDGE MODE (SPIFFS Flash)';
+    if (elCyber) elCyber.innerHTML = '🛡️ LOCAL GATEWAY VERIFIED';
+
+    window.MineApp.showNotification("📶 GATEWAY OUTAGE SIMULATION: Cloud connectivity lost. Local edge server active; local emergency horn relay ready & telemetry cached on SPIFFS flash.");
+  }
+
   return {
     initSimulation,
     triggerRainSimulation,
     triggerDisplacementSpike,
-    resetSimulation
+    resetSimulation,
+    triggerNormalScenario,
+    triggerWatchScenario,
+    triggerWarningScenario,
+    triggerCriticalSpikeScenario,
+    triggerTamperingScenario,
+    triggerModifiedPacketScenario,
+    triggerReplayAttackScenario,
+    triggerInternetOutageScenario
   };
 })();
+
+

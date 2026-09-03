@@ -70,19 +70,16 @@ app.get(['/api', '/api/'], (req, res) => {
 const fs = require('fs');
 
 // Serve static frontend assets for root or non-API requests
-const publicDir = path.join(__dirname, '..', 'public');
 const rootDir = path.join(__dirname, '..');
+const publicDir = path.join(__dirname, '..', 'public');
 
+app.use(express.static(rootDir));
 if (fs.existsSync(publicDir)) {
   app.use(express.static(publicDir));
 }
-app.use(express.static(rootDir));
 
-// Serve index.html for root page requests
+// Serve root index.html for root page requests
 app.get('/', (req, res) => {
-  if (fs.existsSync(path.join(publicDir, 'index.html'))) {
-    return res.sendFile(path.join(publicDir, 'index.html'));
-  }
   res.sendFile(path.join(rootDir, 'index.html'));
 });
 
