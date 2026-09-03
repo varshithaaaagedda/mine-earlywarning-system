@@ -18,6 +18,7 @@ window.MineApp = (function () {
     renderActions();
     renderNotifications();
     renderSensorHealth();
+    updateTelemetryUI();
 
     // Initialize GIS Map & Chart
     window.MineMap.initMap('gis-map');
